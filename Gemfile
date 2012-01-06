@@ -21,15 +21,6 @@ gem 'jquery-rails'
 
 gem 'johnson'
 
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# Use unicorn as the web server
-# gem 'unicorn'
-
-# Deploy with Capistrano
-# gem 'capistrano'
-
-# To use debugger
-# gem 'ruby-debug'
-
+gem "haml-rails" # Provides HAML generator for Rails 3.0. Not needed for Rails 3.1
+gem "sass"
+gem "rails3-generators"
