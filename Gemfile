@@ -24,5 +24,9 @@ gem 'jquery-rails'
 gem 'johnson'
 
 gem "haml-rails" # Provides HAML generator for Rails 3.0. Not needed for Rails 3.1
-gem "sass"
-gem "rails3-generators"
+gem 'sass'
+gem 'rails3-generators'
+
+gem 'soap4r'
+gem 'jira4r'
+
