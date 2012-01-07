@@ -66,18 +66,11 @@ class PostcommitController < ApplicationController
     @commented_issues = Set.new
     @resolved_issues = Set.new
 
-    jira
-
     # Simple lookup for whether to resolve an issue
-    r = Regexp.new('(fixe?[sd]?|resolve[sd]?)? (%s)-([0-9]+)' % [jira_projects.join('|')], Regexp::IGNORECASE)
-
-    require 'pp'
-    pp jira
-
-    return
+    project_keys = jira_projects.map {|p| p.key}
+    r = Regexp.new('(fixe?[sd]?|resolve[sd]?)? (%s)-([0-9]+)' % [project_keys.join('|')], Regexp::IGNORECASE)
 
     @payload["commits"].each do |commit|
-
 
       begin
         time = Time.parse commit["timestamp"]
@@ -86,7 +79,7 @@ class PostcommitController < ApplicationController
       end
 
       rc = Jira4R::V2::RemoteComment.new
-      rc.body = "Found related commit [%s] by %s (%s) at %s\n\n%s\n\n<Message auto-added by Andrew's git post-receive hook magic>" \
+      rc.body = "Found related commit [%s] by %s (%s) at %s\n\n%s\n\n<Message auto-added by pariser's git post-receive hook magic>" \
       % [ commit["url"], commit["author"]["name"], commit["author"]["email"], time.to_s, commit["message"] ]
 
       commit["message"].scan(r) do |match|
@@ -107,8 +100,9 @@ class PostcommitController < ApplicationController
         if should_resolve_issue
           begin
             available_actions = jira.getAvailableActions issue_key
-            if status = available_actions = available_actions.find {|s| s.name == 'Resolve Issue'}
-              jira.progressWorkflowAction(issue_key, status.id.to_s, [])
+            resolve_action = available_actions.find {|s| s.name == 'Resolve Issue'}
+            if !resolve_action.nil?
+              jira.progressWorkflowAction(issue_key, resolve_action.id.to_s, [])
             else
               Rails.logger.debug("Not allowed to resolve issue %s. Allowable actions: %s" % [issue_key, (available_actions.map {|s| s.name}).to_s])
             end
@@ -126,34 +120,29 @@ class PostcommitController < ApplicationController
   protected
 
   def jira
+    # Connect to JIRA
 
     # Load configuration
     unless @jira_config
       @jira_config = YAML.load(File.new "config/jira.yml", 'r')
-      pp @jira_config
     end
 
     # Connect to JIRA
     unless @jira_connection
-      @jira = Jira4R::JiraTool.new(2, @jira_config['address'])
-      @jira.login(@jira_config['username'], @jira_config['password'])
-
-    end
-
-    # Load the list of JIRA projects
-    unless @jira_projects
-      @jira_projects = @jira.getProjects()
+      @jira_connection = Jira4R::JiraTool.new(2, @jira_config['address'])
+      @jira_connection.login(@jira_config['username'], @jira_config['password'])
     end
 
     # Return the connection
     @jira_connection
-
   end
 
   def jira_projects
-    # Load everyting, as required
-    jira
-    # Return the list of projects
+    # Load the list of JIRA projects
+    unless @jira_projects
+      @jira_projects = jira.getProjectsNoSchemes()
+    end
+
     @jira_projects
   end
 
