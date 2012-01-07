@@ -1,63 +1,87 @@
-class PostcommitController < ApplicationController
+class PostreceiveController < ApplicationController
 
   require 'jira4r/jira_tool.rb'
   require 'time'
   require 'yaml'
   require 'pp'
 
-  def index
-
-    # issue_key = 'MVPONE-1017'
-    # jira = jira_connect
-    # pp jira.getAvailableActions issue_key
-    # pp jira.getComments issue_key
-    # pp jira.getProjectByKey 'MVPONE'
-    # pp jira.getIssue issue_key
-
-    pp jira_projects
-
-  end
+  # # Examples of what you may want to do with jira_tool
+  # # and how you may do it inside this controller
+  # # when we say issue_key, we mean "MVPONE-1017" or something similar
+  # # when we say project_key, we mean "MVPONE" or something similar
+  #
+  # # Get details about the issue:
+  # pp jira.getIssue issue_key
+  #
+  # # Get actions you can perform on that issue (i.e. resolve issue):
+  # pp jira.getAvailableActions issue_key
+  #
+  # # Get comments about that issue:
+  # pp jira.getComments issue_key
+  #
+  # # Get information about a given project:
+  # pp jira.getProjectByKey project_key
+  #
+  # # the function jira_projects lets you know what projects are available
+  # # in this JIRA instance:
+  # pp jira_projects
 
   def new
+    # The following is an example payload that github will actually post
+    # on to a url attached to a post-receive hook
+
     @payload = {
-      :before => "5aef35982fb2d34e9d9d4502f6ede1072793222d",
+      :pusher => {
+        :name => "pariser",
+        :email => "pariser@gmail.com"
+      },
       :repository => {
-        :url => "http://github.com/defunkt/github",
-        :name => "github",
-        :description => "You're lookin' at it.",
-        :watchers => 5,
-        :forks => 2,
-        :private => 1,
+        :name => "git_post_receive",
+        :size => 236,
+        :has_wiki => true,
+        :created_at => "2012/01/06 09:37:50 -0800",
+        :watchers => 1,
+        :private => false,
+        :url => "https://github.com/pariser/git_post_receive",
+        :language => "Ruby",
+        :fork => false,
+        :pushed_at => "2012/01/06 18:14:25 -0800",
+        :open_issues => 0,
+        :has_downloads => true,
+        :homepage => "",
+        :has_issues => true,
+        :forks => 1,
+        :description => "Mucking around with post-commit hooks in Git, in part to integrate with JIRA",
         :owner => {
-          :email => "chris@ozmm.org",
-          :name => "defunkt"
+          :name => "pariser",
+          :email => "pariser@gmail.com"
         }
       },
-      :commits => [
-        {
-          :id => "41a212ee83ca127e3c8cf465891ab7216a705f59",
-          :url => "http://github.com/defunkt/github/commit/41a212ee83ca127e3c8cf465891ab7216a705f59",
-          :author => {
-            :email => "chris@ozmm.org",
-            :name => "Chris Wanstrath"
-          },
-          :message => "okay i give in",
-          :timestamp => "2008-02-15T14:57:17-08:00",
-          :added => ["filepath.rb"]
-        },
-        {
-          :id => "de8251ff97ee194a289832576287d6f8ad74e3d0",
-          :url => "http://github.com/defunkt/github/commit/de8251ff97ee194a289832576287d6f8ad74e3d0",
-          :author => {
-            :email => "chris@ozmm.org",
-            :name => "Chris Wanstrath"
-          },
-          :message => "Fixes MVPONE-1017, comments on MVPONE-1018",
-          :timestamp => "2008-02-15T14:36:34-08:00"
-        }
+      :forced => false,
+      :after => "9555a2b9d3e86dddec828c1ba9fb56c8510bc581",
+      :deleted => false,
+      :ref => "refs/heads/master",
+      :commits =>
+      [
+       {
+         :modified => [],
+         :added => ["file"],
+         :timestamp => "2012-01-06T18:13:56-08:00",
+         :removed => [],
+         :author => {
+           :name => "Andrew Pariser",
+           :username => "pariser",
+           :email => "pariser@gmail.com"
+         },
+         :url => "https://github.com/pariser/git_post_receive/commit/9555a2b9d3e86dddec828c1ba9fb56c8510bc581",
+         :id => "9555a2b9d3e86dddec828c1ba9fb56c8510bc581",
+         :distinct => true,
+         :message => "This commit fixes MVPONE-1017\n\nIt also starts work on MVPONE-1018"
+       }
       ],
-      :after => "de8251ff97ee194a289832576287d6f8ad74e3d0",
-      :ref => "refs/heads/master"
+      :compare => "https://github.com/pariser/git_post_receive/compare/82ec878...9555a2b",
+      :before => "82ec8783077c6b5827b4b8468b6ede00f14ec098",
+      :created => false
     }
   end
 
@@ -68,6 +92,7 @@ class PostcommitController < ApplicationController
 
     # Simple lookup for whether to resolve an issue
     project_keys = jira_projects.map {|p| p.key}
+
     r = Regexp.new('(fixe?[sd]?|resolve[sd]?)? (%s)-([0-9]+)' % [project_keys.join('|')], Regexp::IGNORECASE)
 
     @payload["commits"].each do |commit|

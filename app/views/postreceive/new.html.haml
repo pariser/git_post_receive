@@ -1,0 +1,8 @@
+%h1 postreceive#new
+%p Find me in app/views/postreceive/new.html.haml
+
+%form{ :method => 'post', :action => '/postreceive' }
+  %textarea{ :name => 'payload', :id => 'payload', :cols => 80, :rows => 10}
+    #{@payload.to_json}
+  %button{ :type => 'submit', :tabindex => 0, :style => "height: 1.5em; width: 60px;" }
+    Test

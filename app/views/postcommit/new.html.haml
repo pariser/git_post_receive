@@ -1,7 +1,0 @@
-%h1 Postcommit#new
-%p Find me in app/views/postcommit/new.html.haml
-
-%form{ :method => 'post', :action => '/postcommit' }
-  %textarea{ :name => 'payload', :id => 'payload', :cols => 80, :rows => 10}
-    #{@payload.to_json}
-  %button{ :type => 'submit', :value => 'Test', :tabindex => 0, :style => "height: 1.5em; width: 60px;" }

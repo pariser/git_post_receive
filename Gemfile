@@ -2,7 +2,7 @@ source 'http://rubygems.org'
 
 gem 'rails', '3.1.1'
 
-gem "rake", "0.8.7"
+gem 'rake', '0.8.7'
 
 gem 'sqlite3'
 
@@ -18,11 +18,11 @@ end
 
 gem 'johnson'
 
-gem "haml-rails" # Provides HAML generator for Rails 3.0. Not needed for Rails 3.1
+gem 'haml-rails'
 gem 'sass'
 gem 'rails3-generators'
 
 gem 'soap4r'
+gem 'jira4r', :path => 'vendor/plugins/jira4r'
 
-gem "jira4r", :path => 'vendor/plugins/jira4r'
-
+gem 'ruby-github'

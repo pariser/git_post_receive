@@ -4,4 +4,4 @@
 
 require File.expand_path('../config/application', __FILE__)
 
-GitPostCommit::Application.load_tasks
+GitPostReceive::Application.load_tasks
