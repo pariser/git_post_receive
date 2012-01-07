@@ -1,0 +1,5 @@
+# Configuration for your JIRA instance:
+address: 'http://jira.myhost.com'
+username: 'myusername'
+password: 'mypassword'
+projects: [] # List of all JIRA projects' keys

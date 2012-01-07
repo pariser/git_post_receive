@@ -1,5 +1,15 @@
 %h1 Postcommit#create
 %p Find me in app/views/postcommit/create.html.haml
 
+%div{ :style => "border: 1px solid black;" }
+  %h4 Resolved the following issues:
+  %ul
+    - @resolved_issues.to_a.each do |issue|
+      %li #{issue}
+  %h4 Commented on the following issues:
+  %ul
+    - @commented_issues.to_a.each do |issue|
+      %li #{issue}
+
 %pre
   #{@payload.to_json}
