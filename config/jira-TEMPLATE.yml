@@ -2,3 +2,8 @@
 address: 'http://jira.myhost.com'
 username: 'myusername'
 password: 'mypassword'
+
+# SSL Options (only used if connecting via HTTPS)
+ 
+#ssl_version: # The SSL version (SSLv3, SSLv23, ... SSLv3 is the default)
+# verify_certificate: false # true (default) or false. Only disable certificate verification for testing purposes
