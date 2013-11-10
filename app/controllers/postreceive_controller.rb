@@ -155,6 +155,15 @@ class PostreceiveController < ApplicationController
     # Connect to JIRA
     unless @jira_connection
       @jira_connection = Jira4R::JiraTool.new(2, @jira_config['address'])
+      
+      # Optional SSL parameters
+      if !@jira_config['ssl_version'].nil
+        @jira_connection.driver.streamhandler.client.ssl_config.ssl_version = @jira_config['ssl_version']
+      end
+      if @jira_config['ssl_verify'] == false
+        @jira_connection.driver.options['protocol.http.ssl_config.verify_mode'] = OpenSSL::SSL::VERIFY_NONE
+      end
+      
       @jira_connection.login(@jira_config['username'], @jira_config['password'])
     end
 
