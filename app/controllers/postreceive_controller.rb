@@ -104,8 +104,8 @@ class PostreceiveController < ApplicationController
       end
 
       rc = Jira4R::V2::RemoteComment.new
-      rc.body = "Found related commit [%s] by %s (%s) at %s\n\n%s\n\n<Message auto-added by pariser's git post-receive hook magic>" \
-      % [ commit["url"], commit["author"]["name"], commit["author"]["email"], time.to_s, commit["message"] ]
+      rc.body = "commit [%s|%s] by %s on branch %s:\n\n_%s_" \
+      % [ commit["id"], commit["url"], commit["author"]["username"], @payload["ref"], commit["message"] ]
 
       commit["message"].scan(r) do |match|
 
@@ -114,6 +114,7 @@ class PostreceiveController < ApplicationController
 
         # Comment on this issue
         begin
+          rc.body.prepend(should_resolve_issue ? "Fixed by " : "Mentioned in ")  
           jira.addComment(issue_key, rc)
         rescue
           Rails.logger.error("Failed to add comment to issue %s" % [issue_key])
